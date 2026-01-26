@@ -13,10 +13,10 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @NoArgsConstructor
 @Builder
 public class User {
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Keyword) // Keyword used for exact matching of IDs
     private String id;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text) // Text searchable name fields
     private String username;
 
     @Field(type = FieldType.Text)
