@@ -1,4 +1,4 @@
-package com.rayan.restaurant.domain.repository;
+package com.rayan.restaurant.repository;
 
 import com.rayan.restaurant.domain.Restaurant;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
