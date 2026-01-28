@@ -6,12 +6,14 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -27,6 +29,7 @@ public class FileSystemStorageService implements StorageService {
     private Path rootLocation;
 
 
+    // Initializing storage directory
     @PostConstruct // after class is constructed, this method will be run.
     public void init() throws IOException {
         try {
@@ -64,7 +67,23 @@ public class FileSystemStorageService implements StorageService {
     }
 
     @Override
-    public Optional<Resource> loadResource(String id) {
-        return Optional.empty();
+    public Optional<Resource> loadResource(String filename) {
+        try {
+            Path file = rootLocation.resolve(filename);
+            Resource resource = new UrlResource(file.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return Optional.of(resource);
+            } else {
+                return Optional.empty();
+            }
+
+        } catch (MalformedURLException e) {
+            log.warn("Could not read file: %s".formatted(filename), e);
+            // Reason why we didn't throw StorageException:
+            // This is common to happen where user might attempt to load resources doesn't exist
+            // instead of treating this case as error we return empty Optional, we could throw StorageException if you want.
+            return Optional.empty();
+        }
     }
 }
